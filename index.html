@@ -1,133 +1,253 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Alert</title>
-    <style>
-        /* General Styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
-        }
+<meta charset="UTF-8">
+<title>Unit Location</title>
 
-        h1 {
-            text-align: center;
-            color: #fff;
-            background-color: #d32f2f;
-            padding: 20px;
-            font-size: 36px;
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 80vh;
-            padding: 20px;
-        }
+<style>
+:root {
+    --blue: #0b5ed7;
+    --light-blue: #e7f0ff;
+    --dark: #0a2540;
+    --danger: #c82333;
+}
 
-        .alert-box {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-        }
+body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--light-blue);
+    color: var(--dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
-        .alert-box h2 {
-            color: #d32f2f;
-            margin-bottom: 20px;
-        }
+.card {
+    background: white;
+    width: 90%;
+    max-width: 420px;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    text-align: center;
+}
 
-        .alert-box button {
-            background-color: #d32f2f;
-            color: white;
-            font-size: 22px; /* Increased font size */
-            padding: 20px 50px; /* Increased padding for a bigger button */
-            border: none;
-            border-radius: 10px; /* Rounded corners for the button */
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+h2 {
+    margin-top: 0;
+    color: var(--blue);
+    letter-spacing: 1px;
+}
 
-        .alert-box button:hover {
-            background-color: #b71c1c;
-        }
+select, button {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 8px;
+    margin-top: 12px;
+}
 
-        .alert-box p {
-            color: #555;
-            font-size: 16px;
-            margin-top: 10px;
-        }
+select {
+    border: 1px solid #ccc;
+    background: white;
+}
 
-        .alert-box .info {
-            font-weight: bold;
-            color: #d32f2f;
-        }
-    </style>
-    <script>
-        function sendAlert() {
-            let callerName = prompt("Enter your name:");
-            let alertMessage = prompt("Enter the alert message:");
-            
-            if (callerName && alertMessage) {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function(position) {
-                        let latitude = position.coords.latitude;
-                        let longitude = position.coords.longitude;
-                        
-                        let fullAlert = `[${callerName}] ${latitude},${longitude} [${alertMessage}]`;
-                        
-                        alert(fullAlert);
-                        console.log(fullAlert);
-                        
-                        fetch("https://discord.com/api/webhooks/1334945635958259802/WYV3yhet7MyHBaVbsy4UDRoZ-LuH9ks5haNW0CO8YHCLcGK6wZmECcTdYaYKSs0_04UC", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ content: fullAlert })
-                        });
-                    }, function(error) {
-                        let fallbackAlert = `[${callerName}] (Location not available) [${alertMessage}]`;
-                        alert("Could not retrieve location. Alerting without coordinates.");
-                        console.log(fallbackAlert);
-                        
-                        fetch("https://discord.com/api/webhooks/1334945635958259802/WYV3yhet7MyHBaVbsy4UDRoZ-LuH9ks5haNW0CO8YHCLcGK6wZmECcTdYaYKSs0_04UC", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ content: fallbackAlert })
-                        });
-                    });
-                } else {
-                    let fallbackAlert = `[${callerName}] (Location not available) [${alertMessage}]`;
-                    alert("Geolocation is not supported by this browser. Alerting without coordinates.");
-                    console.log(fallbackAlert);
-                    
-                    fetch("https://discord.com/api/webhooks/1334945635958259802/WYV3yhet7MyHBaVbsy4UDRoZ-LuH9ks5haNW0CO8YHCLcGK6wZmECcTdYaYKSs0_04UC", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ content: fallbackAlert })
-                    });
-                }
-            } else {
-                alert("Alert canceled. Please provide all details.");
-            }
-        }
-    </script>
+button.primary {
+    background: var(--blue);
+    color: white;
+    border: none;
+    font-weight: bold;
+}
+
+button.panic {
+    background: var(--danger);
+    color: white;
+    border: none;
+    font-weight: bold;
+    margin-top: 18px;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.status {
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e1e5ea;
+}
+
+.footer {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #666;
+}
+</style>
 </head>
+
 <body>
-    <h1>Emergency Alert System</h1>
-    <div class="container">
-        <div class="alert-box">
-            <h2>Need Immediate Assistance?</h2>
-            <p class="info">Click the button below to send an emergency alert with your location!</p>
-            <button onclick="sendAlert()">Send Emergency Alert</button>
-            <p>In case of an emergency, your alert will be sent to the relevant authorities.</p>
-        </div>
+
+<div class="card">
+    <h2>UNIT LOCATION</h2>
+
+    <select id="unitSelect">
+        <option value="">Select Unit</option>
+        <option value="SWAT">SWAT</option>
+        <option value="PATROL-1">PATROL-1</option>
+        <option value="PATROL-2">PATROL-2</option>
+        <option value="K9">K-9</option>
+        <option value="EMS-1">EMS-1</option>
+    </select>
+
+    <button class="primary" onclick="startTracking()">Start GPS</button>
+
+    <button class="panic" onclick="sendPanic()">🚨 PANIC BUTTON</button>
+
+    <div class="status" id="status">
+        Status: Idle
     </div>
+
+    <div class="footer">
+        Secure Location Reporting
+    </div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const LOCATION_WEBHOOK =
+    "https://discord.com/api/webhooks/1462425246664495285/DlWniEhHnb2_52gKF1fVg3fPafAgGLNOGTJUmq-gI0pX0Qsnx6p8Tgh4M6RwzAcYpfOe"; // 🔴 LOCATION CHANNEL
+const PANIC_WEBHOOK =
+    "https://discord.com/api/webhooks/1462163736667226285/8NxBU506oJupESL3_J9I1NGV0qwuOfFhIbVS0yIc1-llGA_mimQBIJLMv0SnHzOAUih-";   // 🔴 PANIC CHANNEL
+
+const SEND_INTERVAL_MS = 3000;
+/* ========================================= */
+
+let wakeLock = null;
+let lastSent = 0;
+let watchId = null;
+let lastCoords = null;
+let UNIT = localStorage.getItem("selectedUnit") || "";
+
+/* Restore unit selection */
+const unitSelect = document.getElementById("unitSelect");
+if (UNIT) unitSelect.value = UNIT;
+
+unitSelect.addEventListener("change", () => {
+    UNIT = unitSelect.value;
+    localStorage.setItem("selectedUnit", UNIT);
+});
+
+/* Keep screen awake */
+async function requestWakeLock() {
+    try {
+        wakeLock = await navigator.wakeLock.request("screen");
+    } catch {}
+}
+
+/* Send helpers */
+async function sendLocationMessage(message) {
+    try {
+        await fetch(LOCATION_WEBHOOK, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: message })
+        });
+    } catch {}
+}
+
+async function sendPanicMessage(message) {
+    try {
+        await fetch(PANIC_WEBHOOK, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: message })
+        });
+    } catch {}
+}
+
+/* GPS update */
+function handlePosition(pos) {
+    if (!UNIT) return;
+
+    const now = Date.now();
+    if (now - lastSent < SEND_INTERVAL_MS) return;
+
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    lastCoords = { lat, lng };
+
+    const message = `{${UNIT}} (${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+    sendLocationMessage(message);
+
+    document.getElementById("status").innerText =
+        `Unit: ${UNIT}
+Lat: ${lat.toFixed(6)}
+Lng: ${lng.toFixed(6)}
+Last Update: ${new Date().toLocaleTimeString()}`;
+
+    lastSent = now;
+}
+
+/* Start GPS */
+function startTracking() {
+    if (!navigator.geolocation) {
+        alert("Geolocation not supported");
+        return;
+    }
+
+    if (!UNIT) {
+        alert("Please select a unit");
+        return;
+    }
+
+    requestWakeLock();
+
+    watchId = navigator.geolocation.watchPosition(
+        handlePosition,
+        err => {
+            document.getElementById("status").innerText =
+                "GPS error: " + err.message;
+        },
+        {
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+            timeout: 5000
+        }
+    );
+
+    document.getElementById("status").innerText = "Status: Tracking…";
+}
+
+/* PANIC BUTTON */
+function sendPanic() {
+    if (!UNIT || !lastCoords) {
+        alert("GPS not ready");
+        return;
+    }
+
+    const message =
+        `{ALL AVAILABLE UNITS} (${lastCoords.lat.toFixed(6)}, ${lastCoords.lng.toFixed(6)}) ` +
+        `${UNIT} down, panic button activated manually`;
+
+    sendPanicMessage(message);
+
+    document.getElementById("status").innerText =
+        "🚨 PANIC SENT 🚨";
+}
+
+/* Reacquire wake lock */
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && wakeLock === null) {
+        requestWakeLock();
+    }
+});
+</script>
+
 </body>
 </html>
